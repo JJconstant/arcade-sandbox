@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Arcade Sandbox</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        h1 { margin-bottom: 10px; font-size: 24px; color: #ffeb3b; }
+        canvas {
+            border: 4px solid #3f51b5;
+            box-shadow: 0 0 20px rgba(63, 81, 181, 0.5);
+            background-color: black;
+        }
+        .controls {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ARCADE SANDBOX</h1>
+    <div id="score">SCORE: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">Use ARROW KEYS to move. Collect the yellow dots!</div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreElement = document.getElementById("score");
+
+        let score = 0;
+        const tileSize = 20;
+
+        // Player (Pac-Man style)
+        const player = {
+            x: tileSize * 2,
+            y: tileSize * 2,
+            dx: 0,
+            dy: 0,
+            radius: tileSize / 2,
+            speed: 4
+        };
+
+        // Simple Ghost
+        const ghost = {
+            x: tileSize * 15,
+            y: tileSize * 15,
+            size: tileSize,
+            speed: 1.5
+        };
+
+        // Dots to collect
+        let dots = [];
+        function spawnDots() {
+            dots = [];
+            for (let i = 2; i < 18; i += 2) {
+                for (let j = 2; j < 18; j += 2) {
+                    dots.push({ x: i * tileSize, y: j * tileSize, collected: false });
+                }
+            }
+        }
+        spawnDots();
+
+        // Input handling
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp")    { player.dx = 0; player.dy = -player.speed; }
+            if (e.key === "ArrowDown")  { player.dx = 0; player.dy = player.speed; }
+            if (e.key === "ArrowLeft")  { player.dx = -player.speed; player.dy = 0; }
+            if (e.key === "ArrowRight") { player.dx = player.speed; player.dy = 0; }
+        });
+
+        // Game Loop
+        function update() {
+            // Move player
+            player.x += player.dx;
+            player.y += player.dy;
+
+            // Screen boundaries
+            if (player.x < player.radius) player.x = canvas.width - player.radius;
+            if (player.x > canvas.width - player.radius) player.x = player.radius;
+            if (player.y < player.radius) player.y = canvas.height - player.radius;
+            if (player.y > canvas.height - player.radius) player.y = player.radius;
+
+            // Move ghost towards player
+            if (ghost.x < player.x) ghost.x += ghost.speed;
+            if (ghost.x > player.x) ghost.x -= ghost.speed;
+            if (ghost.y < player.y) ghost.y += ghost.speed;
+            if (ghost.y > player.y) ghost.y -= ghost.speed;
+
+            // Check dot collisions
+            dots.forEach(dot => {
+                if (!dot.collected) {
+                    let dist = Math.hypot((player.x - dot.x), (player.y - dot.y));
+                    if (dist < player.radius + 4) {
+                        dot.collected = true;
+                        score += 10;
+                        scoreElement.innerText = "SCORE: " + score;
+                    }
+                }
+            });
+
+            // Check if all dots collected
+            if (dots.every(d => d.collected)) spawnDots();
+
+            // Check ghost collision (Game Over reset)
+            let ghostDist = Math.hypot((player.x - (ghost.x + tileSize/2)), (player.y - (ghost.y + tileSize/2)));
+            if (ghostDist < player.radius + tileSize/2) {
+                score = 0;
+                scoreElement.innerText = "SCORE: 0";
+                player.x = tileSize * 2;
+                player.y = tileSize * 2;
+                player.dx = 0;
+                player.dy = 0;
+                ghost.x = tileSize * 15;
+                ghost.y = tileSize * 15;
+                spawnDots();
+            }
+        }
+
+        function draw() {
+            // Clear screen
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw dots
+            ctx.fillStyle = "#ffeb3b";
+            dots.forEach(dot => {
+                if (!dot.collected) {
+                    ctx.beginPath();
+                    ctx.arc(dot.x, dot.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // Draw Ghost
+            ctx.fillStyle = "#ff1744";
+            ctx.fillRect(ghost.x, ghost.y, ghost.size, ghost.size);
+
+            // Draw Player
+            ctx.fillStyle = "#ffeb3b";
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0.2 * Math.PI, 1.8 * Math.PI); // Mouth open effect
+            ctx.lineTo(player.x, player.y);
+            ctx.fill();
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
