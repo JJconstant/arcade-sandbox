@@ -3,169 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Arcade Sandbox</title>
+    <title>A Magical Message for Cora</title>
     <style>
         body {
-            background-color: #111;
-            color: white;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: #121214;
+            background-image: radial-gradient(circle, #2a1b40 0%, #121214 100%);
+            color: #f0e6d2;
+            font-family: 'Georgia', serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
         }
-        h1 { margin-bottom: 10px; font-size: 24px; color: #ffeb3b; }
-        canvas {
-            border: 4px solid #3f51b5;
-            box-shadow: 0 0 20px rgba(63, 81, 181, 0.5);
-            background-color: black;
-        }
-        .controls {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #aaa;
+
+        h1 {
+            font-size: 2rem;
+            color: #dfb76c;
+            text-shadow: 0 0 10px rgba(223, 183, 108, 0.3);
+            margin-bottom: 30px;
             text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .board {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        /* 3D Card Flip Setup */
+        .card-container {
+            width: 70px;
+            height: 105px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            border-radius: 8px;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            border: 2px solid #dfb76c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        /* CARD BACK: Where the dragon art goes */
+        .card-back {
+            background: #1d1d29;
+            /* Magical placeholder texture using CSS gradients */
+            background-image: radial-gradient(rgba(223, 183, 108, 0.15) 1px, transparent 0),
+                              radial-gradient(rgba(223, 183, 108, 0.15) 1px, transparent 0);
+            background-size: 8px 8px;
+            background-position: 0 0, 4px 4px;
+        }
+
+        .card-back::after {
+            content: "💎";
+            font-size: 1.5rem;
+        }
+
+        /* CARD FACE: The revealed golden letters */
+        .card-front {
+            background: #2c2541;
+            color: #dfb76c;
+            font-size: 2rem;
+            font-weight: bold;
+            transform: rotateY(180deg);
+            text-shadow: 0 0 8px rgba(223, 183, 108, 0.6);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
         }
     </style>
 </head>
 <body>
 
-    <h1>Thank You/h1>
-    <div id="score">SCORE: 0</div>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="controls">Use ARROW KEYS to move. Collect the yellow dots!</div>
+    <h1>✨ CORA'S TREASURE ✨</h1>
+
+    <div class="board">
+        <!-- Row 1: C O R A -->
+        <div class="row" id="row-1">
+            <div class="card-container" onclick="flipCard(this, 'C')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">C</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'O')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">O</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'R')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">R</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'A')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">A</div></div></div>
+        </div>
+        
+        <!-- Row 2: B L U E -->
+        <div class="row" id="row-2">
+            <div class="card-container" onclick="flipCard(this, 'B')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">B</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'L')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">L</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'U')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">U</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'E')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">E</div></div></div>
+        </div>
+
+        <!-- Row 3: J O N E S -->
+        <div class="row" id="row-3">
+            <div class="card-container" onclick="flipCard(this, 'J')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">J</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'O')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">O</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'N')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">N</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'E')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">E</div></div></div>
+            <div class="card-container" onclick="flipCard(this, 'S')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">S</div></div></div>
+        </div>
+    </div>
+
+    <!-- Hidden Audio element -->
+    <audio id="loveAudio" src="IMG_8267.m4a" preload="auto"></audio>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const scoreElement = document.getElementById("score");
+        let flippedCount = 0;
+        const totalCards = 13;
+        const audio = document.getElementById('loveAudio');
 
-        let score = 0;
-        const tileSize = 20;
-
-        // Player (Pac-Man style)
-        const player = {
-            x: tileSize * 2,
-            y: tileSize * 2,
-            dx: 0,
-            dy: 0,
-            radius: tileSize / 2,
-            speed: 4
-        };
-
-        // Simple Ghost
-        const ghost = {
-            x: tileSize * 15,
-            y: tileSize * 15,
-            size: tileSize,
-            speed: 1.5
-        };
-
-        // Dots to collect
-        let dots = [];
-        function spawnDots() {
-            dots = [];
-            for (let i = 2; i < 18; i += 2) {
-                for (let j = 2; j < 18; j += 2) {
-                    dots.push({ x: i * tileSize, y: j * tileSize, collected: false });
+        function flipCard(container, letter) {
+            const card = container.querySelector('.card');
+            
+            // Only count the flip if it wasn't already flipped
+            if (!card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                flippedCount++;
+                
+                // Once the final card is flipped, unlock the treasure audio!
+                if (flippedCount === totalCards) {
+                    setTimeout(() => {
+                        audio.play().catch(e => {
+                            console.log("Audio playback interrupted or needs user interaction check:", e);
+                        });
+                    }, 600); // Small delay so she sees the final card finish turning
                 }
             }
         }
-        spawnDots();
-
-        // Input handling
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowUp")    { player.dx = 0; player.dy = -player.speed; }
-            if (e.key === "ArrowDown")  { player.dx = 0; player.dy = player.speed; }
-            if (e.key === "ArrowLeft")  { player.dx = -player.speed; player.dy = 0; }
-            if (e.key === "ArrowRight") { player.dx = player.speed; player.dy = 0; }
-        });
-
-        // Game Loop
-        function update() {
-            // Move player
-            player.x += player.dx;
-            player.y += player.dy;
-
-            // Screen boundaries
-            if (player.x < player.radius) player.x = canvas.width - player.radius;
-            if (player.x > canvas.width - player.radius) player.x = player.radius;
-            if (player.y < player.radius) player.y = canvas.height - player.radius;
-            if (player.y > canvas.height - player.radius) player.y = player.radius;
-
-            // Move ghost towards player
-            if (ghost.x < player.x) ghost.x += ghost.speed;
-            if (ghost.x > player.x) ghost.x -= ghost.speed;
-            if (ghost.y < player.y) ghost.y += ghost.speed;
-            if (ghost.y > player.y) ghost.y -= ghost.speed;
-
-            // Check dot collisions
-            dots.forEach(dot => {
-                if (!dot.collected) {
-                    let dist = Math.hypot((player.x - dot.x), (player.y - dot.y));
-                    if (dist < player.radius + 4) {
-                        dot.collected = true;
-                        score += 10;
-                        scoreElement.innerText = "SCORE: " + score;
-                    }
-                }
-            });
-
-            // Check if all dots collected
-            if (dots.every(d => d.collected)) spawnDots();
-
-            // Check ghost collision (Game Over reset)
-            let ghostDist = Math.hypot((player.x - (ghost.x + tileSize/2)), (player.y - (ghost.y + tileSize/2)));
-            if (ghostDist < player.radius + tileSize/2) {
-                score = 0;
-                scoreElement.innerText = "SCORE: 0";
-                player.x = tileSize * 2;
-                player.y = tileSize * 2;
-                player.dx = 0;
-                player.dy = 0;
-                ghost.x = tileSize * 15;
-                ghost.y = tileSize * 15;
-                spawnDots();
-            }
-        }
-
-        function draw() {
-            // Clear screen
-            ctx.fillStyle = "black";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw dots
-            ctx.fillStyle = "#ffeb3b";
-            dots.forEach(dot => {
-                if (!dot.collected) {
-                    ctx.beginPath();
-                    ctx.arc(dot.x, dot.y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-
-            // Draw Ghost
-            ctx.fillStyle = "#ff1744";
-            ctx.fillRect(ghost.x, ghost.y, ghost.size, ghost.size);
-
-            // Draw Player
-            ctx.fillStyle = "#ffeb3b";
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.radius, 0.2 * Math.PI, 1.8 * Math.PI); // Mouth open effect
-            ctx.lineTo(player.x, player.y);
-            ctx.fill();
-        }
-
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
-
-        loop();
     </script>
 </body>
 </html>
