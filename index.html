@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>What time is it, Cora?</title>
     <style>
         :root {
@@ -25,9 +25,9 @@
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: none;
         }
 
-        /* Sparkle Background Effect */
         .sparkle-bg {
             position: absolute;
             width: 100%;
@@ -43,14 +43,14 @@
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.75);
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 25px;
             border-radius: 30px;
             box-shadow: 0 20px 40px rgba(255, 118, 159, 0.2);
             border: 4px solid var(--pink);
             backdrop-filter: blur(10px);
             max-width: 90%;
-            width: 450px;
+            width: 420px;
             position: relative;
             z-index: 2;
         }
@@ -59,73 +59,74 @@
             color: #d13b68;
             font-size: 2.2rem;
             margin-top: 0;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px #fff, 4px 4px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px #fff;
         }
 
-        /* Audio controls */
         .audio-btn {
             background: linear-gradient(to bottom, #ff9ebe, var(--pink));
             border: none;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 28px;
+            width: 55px;
+            height: 55px;
+            font-size: 24px;
             color: white;
             cursor: pointer;
-            box-shadow: 0 6px #d13b68, 0 10px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px #d13b68, 0 8px 10px rgba(0,0,0,0.1);
             transition: all 0.1s ease;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
         }
         .audio-btn:active {
             transform: translateY(4px);
-            box-shadow: 0 2px #d13b68, 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 1px #d13b68;
         }
 
         /* The Clock Face */
         .clock {
-            width: 260px;
-            height: 260px;
+            width: 280px;
+            height: 280px;
             border-radius: 50%;
             background: white;
             border: 12px solid var(--purple);
             position: relative;
-            margin: 0 auto 25px auto;
+            margin: 0 auto 20px auto;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 8px 0 var(--purple);
         }
 
-        /* Clock Gems/Markers */
-        .gem {
+        /* Real Numbers on Clock Face */
+        .clock-number {
             position: absolute;
-            width: 14px;
-            height: 14px;
-            background: linear-gradient(135deg, #ff9ebe, #b185ff);
-            transform: rotate(45deg);
-            border-radius: 3px;
+            width: 30px;
+            height: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5d35a6;
+            text-align: center;
+            line-height: 30px;
         }
 
-        /* Hands */
+        /* Hands with CSS Transition for butter-smooth movement */
         .hand {
             position: absolute;
             bottom: 50%;
             left: 50%;
             transform-origin: bottom center;
             border-radius: 10px;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .hour-hand {
-            width: 8px;
-            height: 65px;
+            width: 9px;
+            height: 70px;
             background-color: var(--purple);
-            margin-left: -4px;
+            margin-left: -4.5px;
             z-index: 4;
         }
         .minute-hand {
             width: 6px;
-            height: 95px;
+            height: 105px;
             background-color: var(--pink);
             margin-left: -3px;
             z-index: 5;
@@ -134,8 +135,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             background: var(--gold);
             border: 2px solid white;
             border-radius: 50%;
@@ -143,51 +144,44 @@
             z-index: 6;
         }
 
-        /* Digital Display */
         .digital-display {
             background: #222;
             color: #ffde59;
             font-family: monospace;
-            font-size: 2.5rem;
-            padding: 10px 25px;
+            font-size: 2.6rem;
+            padding: 8px 25px;
             border-radius: 15px;
             display: inline-block;
             letter-spacing: 2px;
             border: 4px solid #444;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
-        /* Controls */
-        .controls {
-            display: flex;
-            justify-content: space-around;
-            gap: 15px;
-        }
-        .dial-btn {
-            flex: 1;
-            padding: 15px 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white;
-            border: none;
+        /* Swipe Controller Pad */
+        .swipe-pad {
+            background: linear-gradient(45deg, #ffc2d4, #e1ccff);
+            border: 3px dashed var(--purple);
             border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 6px rgba(0,0,0,0.2);
-            transition: all 0.1s;
-            font-family: inherit;
+            padding: 20px;
+            color: #5d35a6;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: ns-resize;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
         }
-        .btn-down {
-            background: linear-gradient(to bottom, #b185ff, #8a4fff);
-            box-shadow: 0 6px #6a34cc;
+        .swipe-arrows {
+            font-size: 1.6rem;
+            animation: bounceUpDown 1.5s infinite ease-in-out;
+            display: block;
+            margin: 5px 0;
         }
-        .btn-up {
-            background: linear-gradient(to bottom, #ff769f, #e63e6e);
-            box-shadow: 0 6px #be2450;
-        }
-        .dial-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px rgba(0,0,0,0.2);
+
+        @keyframes bounceUpDown {
+            0%, 100% { transform: translateY(-3px); }
+            50% { transform: translateY(3px); }
         }
 
         /* iOS Welcome Overlay */
@@ -253,9 +247,10 @@
             <div class="digital-display" id="digitalTime">12:00</div>
         </div>
 
-        <div class="controls">
-            <button class="dial-btn btn-down" onclick="changeTime(-15)">◀ Backer</button>
-            <button class="dial-btn btn-up" onclick="changeTime(15)">Forwarder ▶</button>
+        <div class="swipe-pad" id="swipeField">
+            ✨ Swipe UP or DOWN here ✨
+            <span class="swipe-arrows">↕️</span>
+            to move the hands!
         </div>
     </div>
 
@@ -263,43 +258,37 @@
     <audio id="audioSuccess" src="IMG_8328.m4a" preload="auto"></audio>
 
     <script>
-        // Audio Elements
         const audioQuestion = document.getElementById('audioQuestion');
         const audioSuccess = document.getElementById('audioSuccess');
 
-        // Target Time (The real current time)
         let targetHour = 0;
         let targetMinute = 0;
 
-        // Cora's Current Guessed Time (Starts at 12:00)
+        // Cora's Current Time (Starts at 12:00 / 720 minutes into the day)
         let currentMinutes = 12 * 60; 
         let isCelebrating = false;
 
-        // Set up Clock Numbers dynamically
+        // Set up Clock Face Numbers (1 - 12)
         const clockFace = document.getElementById('clockFace');
         for (let i = 1; i <= 12; i++) {
             const angle = (i * 30) * (Math.PI / 180);
-            const radius = 100; // placement radius
-            const x = 130 + radius * Math.sin(angle) - 7;
-            const y = 130 - radius * Math.cos(angle) - 7;
+            const radius = 105; // Distance from center
+            const x = 140 + radius * Math.sin(angle) - 15;
+            const y = 140 - radius * Math.cos(angle) - 15;
             
-            const gem = document.createElement('div');
-            gem.className = 'gem';
-            gem.style.left = `${x}px`;
-            gem.style.top = `${y}px`;
-            clockFace.appendChild(gem);
+            const numLabel = document.createElement('div');
+            numLabel.className = 'clock-number';
+            numLabel.innerText = i;
+            numLabel.style.left = `${x}px`;
+            numLabel.style.top = `${y}px`;
+            clockFace.appendChild(numLabel);
         }
 
         function setTargetToCurrentTime() {
             const now = new Date();
             targetHour = now.getHours() % 12;
             if (targetHour === 0) targetHour = 12;
-            // Round target minutes to nearest 15 to make it matchable via 15-min increments
-            targetMinute = Math.round(now.getMinutes() / 15) * 15;
-            if (targetMinute === 60) {
-                targetMinute = 0;
-                targetHour = (targetHour % 12) + 1;
-            }
+            targetMinute = now.getMinutes(); // Now tracking exactly to the exact minute
         }
 
         function startApp() {
@@ -307,25 +296,14 @@
             setTargetToCurrentTime();
             playQuestion();
             updateClockDisplay();
+            setupSwipeControls();
         }
 
         function playQuestion() {
             if (!isCelebrating) {
                 audioQuestion.currentTime = 0;
-                audioQuestion.play().catch(e => console.log("Audio play blocked", e));
+                audioQuestion.play().catch(e => console.log(e));
             }
-        }
-
-        function changeTime(amount) {
-            if (isCelebrating) return;
-            
-            currentMinutes += amount;
-            // Keep within a 24-hour cycle boundaries naturally
-            if (currentMinutes < 0) currentMinutes += 24 * 60;
-            if (currentMinutes >= 24 * 60) currentMinutes -= 24 * 60;
-
-            updateClockDisplay();
-            checkWinCondition();
         }
 
         function updateClockDisplay() {
@@ -333,19 +311,63 @@
             let minutes = currentMinutes % 60;
             if (hours === 0) hours = 12;
 
-            // Format Digital Display
             const displayHours = hours.toString().padStart(2, '0');
             const displayMinutes = minutes.toString().padStart(2, '0');
             document.getElementById('digitalTime').innerText = `${displayHours}:${displayMinutes}`;
 
-            // Calculate Hand Angles
-            // Minute hand moves 6 degrees per minute
+            // Minute Hand: 6 degrees per minute
             const minuteAngle = minutes * 6;
-            // Hour hand moves 30 degrees per hour + smooth drift based on minutes
+            // Hour Hand: 30 degrees per hour, plus a continuous fractional shift from the minutes
             const hourAngle = (hours * 30) + (minutes * 0.5);
 
             document.getElementById('minuteHand').style.transform = `rotate(${minuteAngle}deg)`;
             document.getElementById('hourHand').style.transform = `rotate(${hourAngle}deg)`;
+        }
+
+        // Swipe Interactivity logic
+        function setupSwipeControls() {
+            const swipeField = document.getElementById('swipeField');
+            let startY = 0;
+            let accumulatedDelta = 0;
+            const sensitivity = 8; // Adjust this value to make swiping faster or slower
+
+            function handleStart(e) {
+                if (isCelebrating) return;
+                startY = e.touches ? e.touches[0].clientY : e.clientY;
+                accumulatedDelta = 0;
+            }
+
+            function handleMove(e) {
+                if (isCelebrating) return;
+                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                const deltaY = startY - currentY; // Up is positive, down is negative
+
+                accumulatedDelta += deltaY;
+                startY = currentY;
+
+                // When drag spans across the threshold, move time by 1 continuous minute
+                if (Math.abs(accumulatedDelta) >= sensitivity) {
+                    const minutesToChange = Math.trunc(accumulatedDelta / sensitivity);
+                    accumulatedDelta = accumulatedDelta % sensitivity;
+                    
+                    currentMinutes += minutesToChange;
+
+                    if (currentMinutes < 0) currentMinutes += 24 * 60;
+                    if (currentMinutes >= 24 * 60) currentMinutes -= 24 * 60;
+
+                    updateClockDisplay();
+                    checkWinCondition();
+                }
+            }
+
+            // Mobile/Tablet Touch Listeners
+            swipeField.addEventListener('touchstart', handleStart, { passive: true });
+            swipeField.addEventListener('touchmove', handleMove, { passive: true });
+
+            // Desktop Mouse Support (for easy testing on your computer)
+            swipeField.addEventListener('mousedown', handleStart);
+            window.addEventListener('mousemove', (e) => { if (startY !== 0) handleMove(e); });
+            window.addEventListener('mouseup', () => { startY = 0; });
         }
 
         function checkWinCondition() {
@@ -363,22 +385,19 @@
             audioSuccess.currentTime = 0;
             audioSuccess.play().catch(e => console.log(e));
 
-            // Start Canvas Confetti & Balloons
             startCelebrationVisuals();
 
-            // Wait 6 seconds (let audio play & visuals show), then reset
             setTimeout(() => {
                 stopCelebrationVisuals();
                 setTargetToCurrentTime();
-                // Reset Cora back to 12:00
-                currentMinutes = 12 * 60;
+                currentMinutes = 12 * 60; // Reset to 12:00
                 isCelebrating = false;
                 updateClockDisplay();
                 playQuestion();
             }, 6000);
         }
 
-        // --- Celebration Visuals System (Canvas) ---
+        // --- Confetti & Balloons Engine ---
         const canvas = document.getElementById('celebrationCanvas');
         const ctx = canvas.getContext('2d');
         let animationFrameId;
@@ -394,8 +413,7 @@
             resizeCanvas();
             particles = [];
             
-            // Generate Confetti
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 120; i++) {
                 particles.push({
                     type: 'confetti',
                     x: Math.random() * canvas.width,
@@ -409,7 +427,6 @@
                 });
             }
 
-            // Generate Balloons
             for (let i = 0; i < 15; i++) {
                 particles.push({
                     type: 'balloon',
@@ -447,7 +464,6 @@
                     p.y += p.speedY;
                     p.x += Math.sin(p.y * p.swingSpeed) * p.swing;
 
-                    // Draw Balloon String
                     ctx.beginPath();
                     ctx.moveTo(p.x, p.y + p.r);
                     ctx.lineTo(p.x, p.y + p.r + 40);
@@ -455,13 +471,11 @@
                     ctx.lineWidth = 1;
                     ctx.stroke();
 
-                    // Draw Balloon Body
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                     ctx.fillStyle = p.color;
                     ctx.fill();
                     
-                    // Highlight reflection
                     ctx.beginPath();
                     ctx.arc(p.x - p.r/3, p.y - p.r/3, p.r/4, 0, Math.PI * 2);
                     ctx.fillStyle = 'rgba(255,255,255,0.4)';
