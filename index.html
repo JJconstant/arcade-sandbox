@@ -3,165 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Magical Message for Cora</title>
+    <title>What time is it, Cora?</title>
     <style>
+        :root {
+            --pink: #ff769f;
+            --purple: #b185ff;
+            --light-pink: #ffe3ec;
+            --gold: #ffd700;
+        }
+
         body {
-            background-color: #121214;
-            background-image: radial-gradient(circle, #2a1b40 0%, #121214 100%);
-            color: #f0e6d2;
-            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ffe3ec 0%, #f1e4ff 100%);
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        h1 {
-            font-size: 2rem;
-            color: #dfb76c;
-            text-shadow: 0 0 10px rgba(223, 183, 108, 0.3);
-            margin-bottom: 30px;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-
-        .board {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .row {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-        }
-
-        /* 3D Card Flip Setup */
-        .card-container {
-            width: 70px;
-            height: 105px;
-            perspective: 1000px;
-            cursor: pointer;
-        }
-
-        .card {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            border-radius: 8px;
-        }
-
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .card-face {
+        /* Sparkle Background Effect */
+        .sparkle-bg {
             position: absolute;
             width: 100%;
             height: 100%;
-            backface-visibility: hidden;
-            border-radius: 8px;
-            border: 2px solid #dfb76c;
-            display: flex;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(circle, #fff 10%, transparent 11%),
+                radial-gradient(circle, #fff 10%, transparent 11%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.3;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.75);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(255, 118, 159, 0.2);
+            border: 4px solid var(--pink);
+            backdrop-filter: blur(10px);
+            max-width: 90%;
+            width: 450px;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            color: #d13b68;
+            font-size: 2.2rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px #fff, 4px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Audio controls */
+        .audio-btn {
+            background: linear-gradient(to bottom, #ff9ebe, var(--pink));
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 6px #d13b68, 0 10px 15px rgba(0,0,0,0.1);
+            transition: all 0.1s ease;
+            margin-bottom: 25px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-sizing: border-box;
+        }
+        .audio-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px #d13b68, 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* CARD BACK: Where the dragon art goes */
-        .card-back {
-            background: #1d1d29;
-            /* Magical placeholder texture using CSS gradients */
-            background-image: radial-gradient(rgba(223, 183, 108, 0.15) 1px, transparent 0),
-                              radial-gradient(rgba(223, 183, 108, 0.15) 1px, transparent 0);
-            background-size: 8px 8px;
-            background-position: 0 0, 4px 4px;
+        /* The Clock Face */
+        .clock {
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: white;
+            border: 12px solid var(--purple);
+            position: relative;
+            margin: 0 auto 25px auto;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 8px 0 var(--purple);
         }
 
-        .card-back::after {
-            content: "💎";
-            font-size: 1.5rem;
+        /* Clock Gems/Markers */
+        .gem {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: linear-gradient(135deg, #ff9ebe, #b185ff);
+            transform: rotate(45deg);
+            border-radius: 3px;
         }
 
-        /* CARD FACE: The revealed golden letters */
-        .card-front {
-            background: #2c2541;
-            color: #dfb76c;
-            font-size: 2rem;
+        /* Hands */
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 10px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .hour-hand {
+            width: 8px;
+            height: 65px;
+            background-color: var(--purple);
+            margin-left: -4px;
+            z-index: 4;
+        }
+        .minute-hand {
+            width: 6px;
+            height: 95px;
+            background-color: var(--pink);
+            margin-left: -3px;
+            z-index: 5;
+        }
+        .center-cap {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background: var(--gold);
+            border: 2px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+        }
+
+        /* Digital Display */
+        .digital-display {
+            background: #222;
+            color: #ffde59;
+            font-family: monospace;
+            font-size: 2.5rem;
+            padding: 10px 25px;
+            border-radius: 15px;
+            display: inline-block;
+            letter-spacing: 2px;
+            border: 4px solid #444;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            margin-bottom: 25px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+        .dial-btn {
+            flex: 1;
+            padding: 15px 10px;
+            font-size: 1.2rem;
             font-weight: bold;
-            transform: rotateY(180deg);
-            text-shadow: 0 0 8px rgba(223, 183, 108, 0.6);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            font-family: inherit;
+        }
+        .btn-down {
+            background: linear-gradient(to bottom, #b185ff, #8a4fff);
+            box-shadow: 0 6px #6a34cc;
+        }
+        .btn-up {
+            background: linear-gradient(to bottom, #ff769f, #e63e6e);
+            box-shadow: 0 6px #be2450;
+        }
+        .dial-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px rgba(0,0,0,0.2);
+        }
+
+        /* iOS Welcome Overlay */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #ffe3ec 0%, #f1e4ff 100%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .start-btn {
+            padding: 20px 50px;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--pink), var(--purple));
+            color: white;
+            border: 5px solid white;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            font-family: inherit;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9;
         }
     </style>
 </head>
 <body>
 
-    <h1>✨ CORA'S TREASURE ✨</h1>
+    <div class="sparkle-bg"></div>
+    <canvas id="celebrationCanvas"></canvas>
 
-    <div class="board">
-        <!-- Row 1: C O R A -->
-        <div class="row" id="row-1">
-            <div class="card-container" onclick="flipCard(this, 'C')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">C</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'O')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">O</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'R')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">R</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'A')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">A</div></div></div>
-        </div>
+    <div class="overlay" id="welcomeOverlay">
+        <h1 style="font-size: 3rem; margin-bottom: 30px;">🌈 Cora's Clock Game! ✨</h1>
+        <button class="start-btn" onclick="startApp()">START! ▶️</button>
+    </div>
+
+    <div class="container">
+        <h1>What time is it, Cora?</h1>
         
-        <!-- Row 2: B L U E -->
-        <div class="row" id="row-2">
-            <div class="card-container" onclick="flipCard(this, 'B')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">B</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'L')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">L</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'U')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">U</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'E')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">E</div></div></div>
+        <button class="audio-btn" onclick="playQuestion()">🔊</button>
+
+        <div class="clock" id="clockFace">
+            <div class="hand hour-hand" id="hourHand"></div>
+            <div class="hand minute-hand" id="minuteHand"></div>
+            <div class="center-cap"></div>
         </div>
 
-        <!-- Row 3: J O N E S -->
-        <div class="row" id="row-3">
-            <div class="card-container" onclick="flipCard(this, 'J')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">J</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'O')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">O</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'N')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">N</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'E')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">E</div></div></div>
-            <div class="card-container" onclick="flipCard(this, 'S')"><div class="card"><div class="card-face card-back"></div><div class="card-face card-front">S</div></div></div>
+        <div>
+            <div class="digital-display" id="digitalTime">12:00</div>
+        </div>
+
+        <div class="controls">
+            <button class="dial-btn btn-down" onclick="changeTime(-15)">◀ Backer</button>
+            <button class="dial-btn btn-up" onclick="changeTime(15)">Forwarder ▶</button>
         </div>
     </div>
 
-    <!-- Hidden Audio element -->
-    <audio id="loveAudio" src="IMG_8267.m4a" preload="auto"></audio>
+    <audio id="audioQuestion" src="IMG_8327.m4a" preload="auto"></audio>
+    <audio id="audioSuccess" src="IMG_8328.m4a" preload="auto"></audio>
 
     <script>
-        let flippedCount = 0;
-        const totalCards = 13;
-        const audio = document.getElementById('loveAudio');
+        // Audio Elements
+        const audioQuestion = document.getElementById('audioQuestion');
+        const audioSuccess = document.getElementById('audioSuccess');
 
-        function flipCard(container, letter) {
-            const card = container.querySelector('.card');
+        // Target Time (The real current time)
+        let targetHour = 0;
+        let targetMinute = 0;
+
+        // Cora's Current Guessed Time (Starts at 12:00)
+        let currentMinutes = 12 * 60; 
+        let isCelebrating = false;
+
+        // Set up Clock Numbers dynamically
+        const clockFace = document.getElementById('clockFace');
+        for (let i = 1; i <= 12; i++) {
+            const angle = (i * 30) * (Math.PI / 180);
+            const radius = 100; // placement radius
+            const x = 130 + radius * Math.sin(angle) - 7;
+            const y = 130 - radius * Math.cos(angle) - 7;
             
-            // Only count the flip if it wasn't already flipped
-            if (!card.classList.contains('flipped')) {
-                card.classList.add('flipped');
-                flippedCount++;
-                
-                // Once the final card is flipped, unlock the treasure audio!
-                if (flippedCount === totalCards) {
-                    setTimeout(() => {
-                        audio.play().catch(e => {
-                            console.log("Audio playback interrupted or needs user interaction check:", e);
-                        });
-                    }, 600); // Small delay so she sees the final card finish turning
-                }
+            const gem = document.createElement('div');
+            gem.className = 'gem';
+            gem.style.left = `${x}px`;
+            gem.style.top = `${y}px`;
+            clockFace.appendChild(gem);
+        }
+
+        function setTargetToCurrentTime() {
+            const now = new Date();
+            targetHour = now.getHours() % 12;
+            if (targetHour === 0) targetHour = 12;
+            // Round target minutes to nearest 15 to make it matchable via 15-min increments
+            targetMinute = Math.round(now.getMinutes() / 15) * 15;
+            if (targetMinute === 60) {
+                targetMinute = 0;
+                targetHour = (targetHour % 12) + 1;
             }
+        }
+
+        function startApp() {
+            document.getElementById('welcomeOverlay').style.display = 'none';
+            setTargetToCurrentTime();
+            playQuestion();
+            updateClockDisplay();
+        }
+
+        function playQuestion() {
+            if (!isCelebrating) {
+                audioQuestion.currentTime = 0;
+                audioQuestion.play().catch(e => console.log("Audio play blocked", e));
+            }
+        }
+
+        function changeTime(amount) {
+            if (isCelebrating) return;
+            
+            currentMinutes += amount;
+            // Keep within a 24-hour cycle boundaries naturally
+            if (currentMinutes < 0) currentMinutes += 24 * 60;
+            if (currentMinutes >= 24 * 60) currentMinutes -= 24 * 60;
+
+            updateClockDisplay();
+            checkWinCondition();
+        }
+
+        function updateClockDisplay() {
+            let hours = Math.floor(currentMinutes / 60) % 12;
+            let minutes = currentMinutes % 60;
+            if (hours === 0) hours = 12;
+
+            // Format Digital Display
+            const displayHours = hours.toString().padStart(2, '0');
+            const displayMinutes = minutes.toString().padStart(2, '0');
+            document.getElementById('digitalTime').innerText = `${displayHours}:${displayMinutes}`;
+
+            // Calculate Hand Angles
+            // Minute hand moves 6 degrees per minute
+            const minuteAngle = minutes * 6;
+            // Hour hand moves 30 degrees per hour + smooth drift based on minutes
+            const hourAngle = (hours * 30) + (minutes * 0.5);
+
+            document.getElementById('minuteHand').style.transform = `rotate(${minuteAngle}deg)`;
+            document.getElementById('hourHand').style.transform = `rotate(${hourAngle}deg)`;
+        }
+
+        function checkWinCondition() {
+            let hours = Math.floor(currentMinutes / 60) % 12;
+            if (hours === 0) hours = 12;
+            let minutes = currentMinutes % 60;
+
+            if (hours === targetHour && minutes === targetMinute) {
+                triggerWin();
+            }
+        }
+
+        function triggerWin() {
+            isCelebrating = true;
+            audioSuccess.currentTime = 0;
+            audioSuccess.play().catch(e => console.log(e));
+
+            // Start Canvas Confetti & Balloons
+            startCelebrationVisuals();
+
+            // Wait 6 seconds (let audio play & visuals show), then reset
+            setTimeout(() => {
+                stopCelebrationVisuals();
+                setTargetToCurrentTime();
+                // Reset Cora back to 12:00
+                currentMinutes = 12 * 60;
+                isCelebrating = false;
+                updateClockDisplay();
+                playQuestion();
+            }, 6000);
+        }
+
+        // --- Celebration Visuals System (Canvas) ---
+        const canvas = document.getElementById('celebrationCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function startCelebrationVisuals() {
+            resizeCanvas();
+            particles = [];
+            
+            // Generate Confetti
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    type: 'confetti',
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 5,
+                    color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+                    speedX: Math.random() * 4 - 2,
+                    speedY: Math.random() * 5 + 4,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 10 - 5
+                });
+            }
+
+            // Generate Balloons
+            for (let i = 0; i < 15; i++) {
+                particles.push({
+                    type: 'balloon',
+                    x: Math.random() * canvas.width,
+                    y: canvas.height + (Math.random() * 400),
+                    r: Math.random() * 20 + 25,
+                    color: `hsl(${Math.random() * 360}, 100%, 65%)`,
+                    speedY: -(Math.random() * 2 + 2),
+                    swing: Math.random() * 2,
+                    swingSpeed: Math.random() * 0.05
+                });
+            }
+
+            animateVisuals();
+        }
+
+        function animateVisuals() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                if (p.type === 'confetti') {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    p.rotation += p.rotationSpeed;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                    ctx.restore();
+
+                    if (p.y > canvas.height) p.y = -20;
+                } else if (p.type === 'balloon') {
+                    p.y += p.speedY;
+                    p.x += Math.sin(p.y * p.swingSpeed) * p.swing;
+
+                    // Draw Balloon String
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y + p.r);
+                    ctx.lineTo(p.x, p.y + p.r + 40);
+                    ctx.strokeStyle = '#888';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    // Draw Balloon Body
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    
+                    // Highlight reflection
+                    ctx.beginPath();
+                    ctx.arc(p.x - p.r/3, p.y - p.r/3, p.r/4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.fill();
+
+                    if (p.y < -p.r * 2) p.y = canvas.height + 100;
+                }
+            });
+
+            animationFrameId = requestAnimationFrame(animateVisuals);
+        }
+
+        function stopCelebrationVisuals() {
+            cancelAnimationFrame(animationFrameId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
 </body>
